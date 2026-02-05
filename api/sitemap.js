@@ -1,8 +1,6 @@
-// api/sitemap.js - النسخة المُصلَحة
 const { Builder } = require('xml2js');
 const admin = require('firebase-admin');
 
-// دالة تنظيف النص لملف XML
 function escapeXml(text) {
   if (!text) return '';
   return text
@@ -13,7 +11,6 @@ function escapeXml(text) {
     .replace(/'/g, '&apos;');
 }
 
-// تهيئة Firebase
 if (!admin.apps.length) {
   const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
   admin.initializeApp({
@@ -24,8 +21,6 @@ const db = admin.firestore();
 
 module.exports = async (req, res) => {
   try {
-    console.log('🚀 بدء توليد sitemap.xml مع الأولويات...');
-    
     const xmlBuilder = new Builder({
       xmldec: { version: '1.0', encoding: 'UTF-8' },
       renderOpts: { pretty: true, indent: '  ' }
@@ -42,18 +37,10 @@ module.exports = async (req, res) => {
       }
     };
 
-    // 1️⃣ الصفحات الثابتة
     const staticPages = [
       { loc: 'https://arabitoday.net/', priority: '1.0' },
       { loc: 'https://arabitoday.net/about.html', priority: '0.9' },
-      { loc: 'https://arabitoday.net/contact.html', priority: '0.8' },
-      { loc: 'https://arabitoday.net/category.html?cat=politics', priority: '0.9' },
-      { loc: 'https://arabitoday.net/category.html?cat=economy', priority: '0.9' },
-      { loc: 'https://arabitoday.net/category.html?cat=sport', priority: '0.9' },
-      { loc: 'https://arabitoday.net/category.html?cat=technology', priority: '0.9' },
-      { loc: 'https://arabitoday.net/category.html?cat=entertain', priority: '0.9' },
-      { loc: 'https://arabitoday.net/category.html?cat=culture', priority: '0.9' },
-      { loc: 'https://arabitoday.net/category.html?cat=health', priority: '0.9' }
+      { loc: 'https://arabitoday.net/contact.html', priority: '0.8' }
     ];
 
     staticPages.forEach(page => {
@@ -65,21 +52,15 @@ module.exports = async (req, res) => {
       });
     });
 
-    // 2️⃣ جلب المقالات من Firestore
-    console.log('📥 جلب المقالات مع الأولويات...');
     const articlesSnapshot = await db.collection('articles')
       .orderBy('createdAt', 'desc')
       .limit(500)
       .get();
 
-    console.log(`✅ تم جلب ${articlesSnapshot.size} مقال`);
-
-    // 3️⃣ معالجة كل مقال مع الأولوية المناسبة
     articlesSnapshot.forEach(doc => {
       const article = doc.data();
       const articleUrl = `https://arabitoday.net/article.html?id=${doc.id}`;
       
-      // تحديد تاريخ التعديل
       let lastmod = new Date().toISOString().split('T')[0];
       if (article.updatedAt && article.updatedAt.toDate) {
         lastmod = article.updatedAt.toDate().toISOString().split('T')[0];
@@ -87,8 +68,7 @@ module.exports = async (req, res) => {
         lastmod = article.createdAt.toDate().toISOString().split('T')[0];
       }
 
-      // 🎯 تحديد الأولوية حسب الحالة
-      let priority = '0.8'; // الافتراضي
+      let priority = '0.8';
       if (article.status === 'منشور') priority = '0.8';
       if (article.status === 'مسودة') priority = '0.7';
       if (article.status === 'نبذة') priority = '0.6';
@@ -100,7 +80,6 @@ module.exports = async (req, res) => {
         priority: priority
       };
 
-      // إضافة وسم Google News للمقالات المنشورة فقط
       if (article.status === 'منشور' && article.category !== 'المعرفة') {
         urlEntry['news:news'] = {
           'news:publication': {
@@ -112,7 +91,6 @@ module.exports = async (req, res) => {
         };
       }
 
-      // إضافة صورة إن وجدت
       if (article.imageUrl) {
         urlEntry['image:image'] = {
           'image:loc': article.imageUrl,
@@ -124,29 +102,23 @@ module.exports = async (req, res) => {
       urlset.urlset.url.push(urlEntry);
     });
 
-    // 4️⃣ توليد XML
     const xml = xmlBuilder.buildObject(urlset);
     
-    // ⚠️ المهم: التعليقات تأتي بعد <?xml>
-    const finalXml = `<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-  🗺️ خريطة موقع اليوم العربي
-  📅 التحديث: ${new Date().toLocaleDateString('ar-EG')}
-  📊 عدد الروابط: ${urlset.urlset.url.length}
-  🎯 الأولويات: منشور (0.8) | مسودة (0.7) | نبذة (0.6)
--->
-${xml}`;
+    // ⚠️ هذه السطر بالضبط هو المهم: <?xml يجب أن يكون أول حرف في الناتج
+    const finalXml = `<?xml version="1.0" encoding="UTF-8"?>\n${xml}`;
     
+    // ⚠️ لا تكتب أي شيء إلى res قبل finalXml
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=7200');
-    res.setHeader('X-Sitemap-Stats', `articles=${articlesSnapshot.size}, date=${new Date().toISOString()}`);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
     res.status(200).send(finalXml);
     
-    console.log(`✅ تم توليد Sitemap بـ ${urlset.urlset.url.length} رابط`);
-    console.log(`🎯 الأولويات: منشور (0.8) | مسودة (0.7) | نبذة (0.6)`);
+    console.log(`✅ Sitemap بـ ${urlset.urlset.url.length} رابط`);
     
   } catch (error) {
-    console.error('❌ خطأ في sitemap:', error);
-    res.status(500).send(`<error>خطأ في توليد خريطة الموقع: ${error.message}</error>`);
+    console.error('❌ خطأ:', error);
+    // ⚠️ حتى رسالة الخطأ يجب أن تبدأ بـ <?xml
+    const errorXml = `<?xml version="1.0" encoding="UTF-8"?>\n<error>${error.message}</error>`;
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.status(500).send(errorXml);
   }
 };
