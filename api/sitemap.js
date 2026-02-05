@@ -104,10 +104,13 @@ module.exports = async (req, res) => {
 
     const xml = xmlBuilder.buildObject(urlset);
     
-    // ⚠️ هذه السطر بالضبط هو المهم: <?xml يجب أن يكون أول حرف في الناتج
-    const finalXml = `<?xml version="1.0" encoding="UTF-8"?>\n${xml}`;
+    // ⚠️ هذا هو السطر الحرج: لا مسافات قبله في الناتج النهائي
+    const finalXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${xml.substring(xml.indexOf('<url>'))}`;
     
-    // ⚠️ لا تكتب أي شيء إلى res قبل finalXml
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=3600');
     res.status(200).send(finalXml);
@@ -116,7 +119,6 @@ module.exports = async (req, res) => {
     
   } catch (error) {
     console.error('❌ خطأ:', error);
-    // ⚠️ حتى رسالة الخطأ يجب أن تبدأ بـ <?xml
     const errorXml = `<?xml version="1.0" encoding="UTF-8"?>\n<error>${error.message}</error>`;
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.status(500).send(errorXml);
