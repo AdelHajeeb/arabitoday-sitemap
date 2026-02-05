@@ -1,4 +1,4 @@
-// api/sitemap.js - النسخة المُحسَّنة مع الأولويات
+// api/sitemap.js - النسخة المُصلَحة
 const { Builder } = require('xml2js');
 const admin = require('firebase-admin');
 
@@ -90,15 +90,14 @@ module.exports = async (req, res) => {
       // 🎯 تحديد الأولوية حسب الحالة
       let priority = '0.8'; // الافتراضي
       if (article.status === 'منشور') priority = '0.8';
-      if (article.status === 'نبذة') priority = '0.7';
-      if (article.status === 'مسودة') priority = '0.6';
+      if (article.status === 'مسودة') priority = '0.7';
+      if (article.status === 'نبذة') priority = '0.6';
 
       const urlEntry = {
         loc: articleUrl,
         lastmod: lastmod,
         changefreq: 'daily',
-        priority: priority,
-        comment: `حالة: ${article.status || 'غير محدد'}`
+        priority: priority
       };
 
       // إضافة وسم Google News للمقالات المنشورة فقط
@@ -128,12 +127,13 @@ module.exports = async (req, res) => {
     // 4️⃣ توليد XML
     const xml = xmlBuilder.buildObject(urlset);
     
+    // ⚠️ المهم: التعليقات تأتي بعد <?xml>
     const finalXml = `<?xml version="1.0" encoding="UTF-8"?>
 <!-- 
   🗺️ خريطة موقع اليوم العربي
   📅 التحديث: ${new Date().toLocaleDateString('ar-EG')}
   📊 عدد الروابط: ${urlset.urlset.url.length}
-  🎯 الأولويات: منشور (0.8) | نبذة (0.7) | مسودة (0.6)
+  🎯 الأولويات: منشور (0.8) | مسودة (0.7) | نبذة (0.6)
 -->
 ${xml}`;
     
@@ -143,7 +143,7 @@ ${xml}`;
     res.status(200).send(finalXml);
     
     console.log(`✅ تم توليد Sitemap بـ ${urlset.urlset.url.length} رابط`);
-    console.log(`🎯 الأولويات: منشور (0.8) | نبذة (0.7) | مسودة (0.6)`);
+    console.log(`🎯 الأولويات: منشور (0.8) | مسودة (0.7) | نبذة (0.6)`);
     
   } catch (error) {
     console.error('❌ خطأ في sitemap:', error);
