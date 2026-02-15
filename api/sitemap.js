@@ -55,7 +55,7 @@ module.exports = async (req, res) => {
       { loc: 'https://www.arabitoday.net/unsubscribe.html', priority: '0.5', changefreq: 'monthly' },
       
       // صفحات المحتوى (أقسام)
-      { loc: 'https://www.arabitoday.net/markets.html', priority: '0.9', changefreq: 'hourly' },
+      { loc: 'https://www.arabitoday.net/markets.html', priority: '0.9', changefreq: 'daily' },
       { loc: 'https://www.arabitoday.net/knowledge.html', priority: '0.8', changefreq: 'daily' },
       { loc: 'https://www.arabitoday.net/sitemap.html', priority: '0.7', changefreq: 'weekly' },
     ];
