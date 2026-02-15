@@ -37,17 +37,34 @@ module.exports = async (req, res) => {
       }
     };
 
+    // ✅ جميع الصفحات الثابتة في موقعك
     const staticPages = [
-      { loc: 'https://www.arabitoday.net/', priority: '1.0' },
-      { loc: 'https://www.arabitoday.net/about.html', priority: '0.9' },
-      { loc: 'https://www.arabitoday.net/contact.html', priority: '0.8' }
+      // الصفحات الرئيسية
+      { loc: 'https://www.arabitoday.net/', priority: '1.0', changefreq: 'daily' },
+      { loc: 'https://www.arabitoday.net/index.html', priority: '1.0', changefreq: 'daily' },
+      
+      // الصفحات الثابتة المهمة
+      { loc: 'https://www.arabitoday.net/about.html', priority: '0.8', changefreq: 'monthly' },
+      { loc: 'https://www.arabitoday.net/contact.html', priority: '0.8', changefreq: 'monthly' },
+      { loc: 'https://www.arabitoday.net/privacy.html', priority: '0.6', changefreq: 'yearly' },
+      { loc: 'https://www.arabitoday.net/terms.html', priority: '0.6', changefreq: 'yearly' },
+      { loc: 'https://www.arabitoday.net/help.html', priority: '0.7', changefreq: 'weekly' },
+      
+      // صفحات الخدمات
+      { loc: 'https://www.arabitoday.net/subscribe.html', priority: '0.7', changefreq: 'weekly' },
+      { loc: 'https://www.arabitoday.net/unsubscribe.html', priority: '0.5', changefreq: 'monthly' },
+      
+      // صفحات المحتوى (أقسام)
+      { loc: 'https://www.arabitoday.net/markets.html', priority: '0.9', changefreq: 'hourly' },
+      { loc: 'https://www.arabitoday.net/knowledge.html', priority: '0.8', changefreq: 'daily' },
+      { loc: 'https://www.arabitoday.net/sitemap.html', priority: '0.7', changefreq: 'weekly' },
     ];
 
     staticPages.forEach(page => {
       urlset.urlset.url.push({
         loc: page.loc,
         lastmod: new Date().toISOString().split('T')[0],
-        changefreq: 'daily',
+        changefreq: page.changefreq,
         priority: page.priority
       });
     });
@@ -59,7 +76,6 @@ module.exports = async (req, res) => {
 
     articlesSnapshot.forEach(doc => {
       const article = doc.data();
-      // ✅ تعديل هنا: استخدام الرابط الجديد بصيغة .html
       const articleUrl = `https://www.arabitoday.net/${doc.id}.html`;
       
       let lastmod = new Date().toISOString().split('T')[0];
@@ -105,7 +121,6 @@ module.exports = async (req, res) => {
 
     const xml = xmlBuilder.buildObject(urlset);
     
-    // ⚠️ هذا هو السطر الحرج: لا مسافات قبله في الناتج النهائي
     const finalXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
