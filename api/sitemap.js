@@ -38,9 +38,9 @@ module.exports = async (req, res) => {
     };
 
     const staticPages = [
-      { loc: 'https://arabitoday.net/', priority: '1.0' },
-      { loc: 'https://arabitoday.net/about.html', priority: '0.9' },
-      { loc: 'https://arabitoday.net/contact.html', priority: '0.8' }
+      { loc: 'https://www.arabitoday.net/', priority: '1.0' },
+      { loc: 'https://www.arabitoday.net/about.html', priority: '0.9' },
+      { loc: 'https://www.arabitoday.net/contact.html', priority: '0.8' }
     ];
 
     staticPages.forEach(page => {
@@ -59,7 +59,8 @@ module.exports = async (req, res) => {
 
     articlesSnapshot.forEach(doc => {
       const article = doc.data();
-      const articleUrl = `https://arabitoday.net/article.html?id=${doc.id}`;
+      // ✅ تعديل هنا: استخدام الرابط الجديد بصيغة .html
+      const articleUrl = `https://www.arabitoday.net/${doc.id}.html`;
       
       let lastmod = new Date().toISOString().split('T')[0];
       if (article.updatedAt && article.updatedAt.toDate) {
