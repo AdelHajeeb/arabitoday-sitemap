@@ -40,24 +40,24 @@ module.exports = async (req, res) => {
     // ✅ جميع الصفحات الثابتة في موقعك
     const staticPages = [
       // الصفحات الرئيسية
-      { loc: 'https://www.arabitoday.net/', priority: '1.0', changefreq: 'daily' },
-      { loc: 'https://www.arabitoday.net/index.html', priority: '1.0', changefreq: 'daily' },
+      { loc: 'https://arabitoday.net/', priority: '1.0', changefreq: 'daily' },
+      { loc: 'https://arabitoday.net/index.html', priority: '1.0', changefreq: 'daily' },
       
       // الصفحات الثابتة المهمة
-      { loc: 'https://www.arabitoday.net/about.html', priority: '0.8', changefreq: 'monthly' },
-      { loc: 'https://www.arabitoday.net/contact.html', priority: '0.8', changefreq: 'monthly' },
-      { loc: 'https://www.arabitoday.net/privacy.html', priority: '0.6', changefreq: 'yearly' },
-      { loc: 'https://www.arabitoday.net/terms.html', priority: '0.6', changefreq: 'yearly' },
-      { loc: 'https://www.arabitoday.net/help.html', priority: '0.7', changefreq: 'weekly' },
+      { loc: 'https://arabitoday.net/about.html', priority: '0.8', changefreq: 'monthly' },
+      { loc: 'https://arabitoday.net/contact.html', priority: '0.8', changefreq: 'monthly' },
+      { loc: 'https://arabitoday.net/privacy.html', priority: '0.6', changefreq: 'yearly' },
+      { loc: 'https://arabitoday.net/terms.html', priority: '0.6', changefreq: 'yearly' },
+      { loc: 'https://arabitoday.net/help.html', priority: '0.7', changefreq: 'weekly' },
       
       // صفحات الخدمات
-      { loc: 'https://www.arabitoday.net/subscribe.html', priority: '0.7', changefreq: 'weekly' },
-      { loc: 'https://www.arabitoday.net/unsubscribe.html', priority: '0.5', changefreq: 'monthly' },
+      { loc: 'https://arabitoday.net/subscribe.html', priority: '0.7', changefreq: 'weekly' },
+      { loc: 'https://arabitoday.net/unsubscribe.html', priority: '0.5', changefreq: 'monthly' },
       
       // صفحات المحتوى (أقسام)
-      { loc: 'https://www.arabitoday.net/markets.html', priority: '0.9', changefreq: 'daily' },
-      { loc: 'https://www.arabitoday.net/knowledge.html', priority: '0.8', changefreq: 'daily' },
-      { loc: 'https://www.arabitoday.net/sitemap.html', priority: '0.7', changefreq: 'weekly' },
+      { loc: 'https://arabitoday.net/markets.html', priority: '0.9', changefreq: 'daily' },
+      { loc: 'https://arabitoday.net/knowledge.html', priority: '0.8', changefreq: 'daily' },
+      { loc: 'https://arabitoday.net/sitemap.html', priority: '0.7', changefreq: 'weekly' },
     ];
 
     staticPages.forEach(page => {
@@ -76,7 +76,7 @@ module.exports = async (req, res) => {
 
     articlesSnapshot.forEach(doc => {
       const article = doc.data();
-      const articleUrl = `https://www.arabitoday.net/${doc.id}.html`;
+      const articleUrl = `https://arabitoday.net/${doc.id}.html`;
       
       let lastmod = new Date().toISOString().split('T')[0];
       if (article.updatedAt && article.updatedAt.toDate) {
