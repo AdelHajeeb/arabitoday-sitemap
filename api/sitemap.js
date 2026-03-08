@@ -59,7 +59,8 @@ module.exports = async (req, res) => {
       { loc: 'https://arabitoday.net/knowledge.html', priority: '0.8', changefreq: 'daily' },
       { loc: 'https://arabitoday.net/sitemap.html', priority: '0.7', changefreq: 'weekly' },
         // صفحة أسعار العملات
-  { loc: 'https://arabitoday.net/currency.html', priority: '0.9', changefreq: 'daily' }, 
+     { loc: 'https://arabitoday.net/currency.html', priority: '0.9', changefreq: 'daily' }, 
+      { loc: 'https://arabitoday.net/gulf-news.html', priority: '0.9', changefreq: 'daily' }
     ];
 
     staticPages.forEach(page => {
